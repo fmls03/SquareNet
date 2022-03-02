@@ -16,7 +16,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-#modello
+
+
 class User(db.Model):
     email = db.Column(db.String(255), unique = True)
     username = db.Column(db.String(255), unique = True)
@@ -27,6 +28,7 @@ class User(db.Model):
         self.email = email
         self.username = username
         self.passw = passw
+
 
 
 class Post(db.Model):
@@ -42,13 +44,10 @@ class Post(db.Model):
         self.insertTime = insertTime
         self.likes = likes
 
-@app.route('/')
-def Empty_Session():
-    logout()
-    return redirecting()
 
 
 
+app.route('/')
 def logout():
     session['logged_in'] = False  
     session.clear()
@@ -126,9 +125,12 @@ def login():
 
 @app.route('/Home')
 def Home():
+    if not session.get('logged_in'):
+        return logout()
     return render_template('home.html')    
 
 
 
 if __name__ == "__main__":
     app.run("localhost", 5000, debug=True)
+    logout()
