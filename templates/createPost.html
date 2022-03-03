@@ -21,7 +21,7 @@
 
         alt="" width="30" height="30"
           class="d-inline-block align-text-top">
-        New Promemoria
+        New Post
       </a>
     </div>
   </nav>
@@ -33,8 +33,8 @@
           aria-label="default input example" required>{{ request.form['title'] }}</input>
       </div>
       <div>
-        <input class="form-control" type="text" name="info" placeholder="Add description"
-          aria-label="default input example" required>{{ request.form['info'] }}</input>
+        <input class="form-control" type="text" name="description" placeholder="Add description"
+          aria-label="default input example" required>{{ request.form['description'] }}</input>
       </div>
       <div class="form-group mb-3">
         <button type="submit" class="btn btn-success btn-sm m-4" style="float: right;">Save</button>

@@ -11,18 +11,18 @@ key = str(key)
 
 app = Flask(__name__) # Modulo flask
 app.config['SECRET_KEY'] = key
-app.config ['SQLALCHEMY_DATABASE_URI'] = 'mysql://fmls03:Schipilliti03!@93.45.81.217/SquareNet'
+app.config ['SQLALCHEMY_DATABASE_URI'] = 'mysql://fmls03:Schipilliti03!@localhost/SquareNet'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-id_acc = ""
+
 
 class Users(db.Model):
     email = db.Column(db.String(255), unique = True)
     username = db.Column(db.String(255), unique = True)
     passw = db.Column(db.String(255))
-    id_acc = db.Column(db.Integer, primary_key = True) 
+    id_acc = db.Column(db.Integer, primary_key = True, autoincrement = True) 
 
     def __init__(self, email, username, passw):
         self.email = email
@@ -36,13 +36,18 @@ class Posts(db.Model):
     description = db.Column(db.String(255))
     insertTime = db.Column(db.DateTime)
     likes = db.Column(db.Integer)
-    id_acc = db.Column(db.Integer)
+    publisher = db.Column(db.String(255))
 
-    def __init__(self, title, description, insertTime, likes):
+    def __init__(self, title, description, insertTime, likes, publisher):
         self.title = title
         self.description = description
         self.insertTime = insertTime
         self.likes = likes
+        self.publisher = publisher
+
+
+
+username = ""
 
 
 @app.route('/')
@@ -62,7 +67,7 @@ def redirecting():
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
-    global id_acc
+    global username
     logout()
     alert = ""
     if request.method == 'POST':
@@ -92,7 +97,7 @@ def signup():
             u = Users(email, username, passw)
             db.session.add(u)
             db.session.commit()
-                
+             
             return redirecting()
                 
                 
@@ -102,7 +107,7 @@ def signup():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     logout()
-    global id_acc
+    global username
     alert = ""
     if request.method == 'POST':
         username = str(request.form['username'])
@@ -111,11 +116,10 @@ def login():
         for user in users:
             if username == user.username:
                 if sha256_crypt.verify(passw, user.passw):
-                    session['logged_in'] = True
-                    return redirecting()
+                    session['logged_in'] = True   
+                    return redirecting()           
             else:
-                alert = "* WRONG CREDENTIALS *"
-
+                alert = "* WRONG CREDENTIALS *" 
     return render_template("login.html", alert=alert, session=session)
 
 
@@ -124,11 +128,12 @@ def Home():
     if not session.get('logged_in'):
         return logout()
     else:
-        posts = db.engine.execute("SELECT * FROM posts")
-        for post in posts:
-            username = db.engine.execute("SELECT username FROM users WHERE id_acc = :val", {'val' : post.id_acc})
+        i = 2
+        #posts = db.engine.execute("SELECT * FROM posts")
+        #for post in posts:
+        #    username = db.engine.execute("SELECT username FROM users WHERE id_acc = :val", {'val' : post.id_acc})
 
-    return render_template('home.html', post = post, username = username)    
+    return render_template('home.html', username=username)#, post = post)    
 
 
 @app.route('/createPost', methods=['GET', 'POST'])
@@ -139,12 +144,13 @@ def createPost():
         if request.method == 'POST':
             title = request.form['title']
             description = request.form['description']
-            now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            newPost = Posts(title, description, now, 0, id_acc)
+            now = datetime.now()
+            likes = 0
+            publisher = username
+            newPost = Posts(title, description, now,likes, publisher)
             db.session.add(newPost)
             db.session.commit()
-
-            return redirecting()
+            return redirect('/Home')
     return render_template('createPost.html')
 
 if __name__ == "__main__":
