@@ -2,7 +2,7 @@ from crypt import methods
 import os 
 from flask import Flask, render_template, redirect, request, session, flash, url_for
 from passlib.hash import sha256_crypt
-from datetime import date
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
 
@@ -16,7 +16,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-
+id_acc = ""
 
 class Users(db.Model):
     email = db.Column(db.String(255), unique = True)
@@ -67,6 +67,7 @@ def redirecting():
 
 @app.route('/signup', methods=["GET", "POST"])
 def signup():
+    global id_acc
     logout()
     alert = ""
     if request.method == 'POST':
@@ -93,7 +94,7 @@ def signup():
         if err == 0:
             session['logged_in'] = True 
             passw = sha256_crypt.hash(passw)
-            u = User(email, username, passw)
+            u = Users(email, username, passw)
             db.session.add(u)
             db.session.commit()
                 
@@ -107,6 +108,7 @@ def signup():
 @app.route('/login', methods=["GET", "POST"])
 def login():
     logout()
+    global id_acc
     alert = ""
     if request.method == 'POST':
         username = str(request.form['username'])
@@ -133,12 +135,24 @@ def Home():
         for post in posts:
             username = db.engine.execute("SELECT username FROM users WHERE id_acc = :val", {'val' : post.id_acc})
 
-        
-            
-
     return render_template('home.html', post = post, username = username)    
 
 
+
+@app.route('/createPost', methods=['GET', 'POST'])
+def createPost():
+    if not session.get('logged_in'):
+        return logout()
+    else:
+        if request.method == 'POST':
+            title = request.form['title']
+            description = request.form['description']
+            newPost = Posts(title, description, datetime.now().strftime("%d/%m/%Y %H:%M:%S"), 0, id_acc)
+            db.session.add(newPost)
+            db.session.commit()
+
+            return redirecting()
+    return render_template('createPost.html')
 
 if __name__ == "__main__":
     app.run("localhost", 5000, debug=True)
