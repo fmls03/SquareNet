@@ -30,7 +30,6 @@ class Users(db.Model):
         self.passw = passw
 
 
-
 class Posts(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     title = db.Column(db.String(255))
@@ -46,14 +45,11 @@ class Posts(db.Model):
         self.likes = likes
 
 
-
-
-app.route('/')
+@app.route('/')
 def logout():
     session['logged_in'] = False  
     session.clear()
     return redirecting()
-
 
 
 @app.route('/redirecting')
@@ -62,7 +58,6 @@ def redirecting():
         return redirect('/signup')
     else:
         return redirect('/Home')
-
 
 
 @app.route('/signup', methods=["GET", "POST"])
@@ -104,7 +99,6 @@ def signup():
     return render_template("signup.html", alert=alert, session=session)
 
 
-
 @app.route('/login', methods=["GET", "POST"])
 def login():
     logout()
@@ -125,7 +119,6 @@ def login():
     return render_template("login.html", alert=alert, session=session)
 
 
-
 @app.route('/Home')
 def Home():
     if not session.get('logged_in'):
@@ -138,7 +131,6 @@ def Home():
     return render_template('home.html', post = post, username = username)    
 
 
-
 @app.route('/createPost', methods=['GET', 'POST'])
 def createPost():
     if not session.get('logged_in'):
@@ -147,7 +139,8 @@ def createPost():
         if request.method == 'POST':
             title = request.form['title']
             description = request.form['description']
-            newPost = Posts(title, description, datetime.now().strftime("%d/%m/%Y %H:%M:%S"), 0, id_acc)
+            now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            newPost = Posts(title, description, now, 0, id_acc)
             db.session.add(newPost)
             db.session.commit()
 
