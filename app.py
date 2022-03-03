@@ -11,14 +11,14 @@ key = str(key)
 
 app = Flask(__name__) # Modulo flask
 app.config['SECRET_KEY'] = key
-app.config ['SQLALCHEMY_DATABASE_URI'] = 'mysql://fmls03:Schipilliti03!@localhost/SquareNet'
+app.config ['SQLALCHEMY_DATABASE_URI'] = 'mysql://fmls03:Schipilliti03!@93.45.81.217/SquareNet'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
 
 
-class User(db.Model):
+class Users(db.Model):
     email = db.Column(db.String(255), unique = True)
     username = db.Column(db.String(255), unique = True)
     passw = db.Column(db.String(255))
@@ -31,12 +31,13 @@ class User(db.Model):
 
 
 
-class Post(db.Model):
+class Posts(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     title = db.Column(db.String(255))
     description = db.Column(db.String(255))
     insertTime = db.Column(db.DateTime)
     likes = db.Column(db.Integer)
+    id_acc = db.Column(db.Integer)
 
     def __init__(self, title, description, insertTime, likes):
         self.title = title
@@ -73,7 +74,7 @@ def signup():
         username = str(request.form['username'])  
         passw= str(request.form['passw'])
         confirm_passw = str(request.form['confirm_passw'])
-        users = User.query.all()
+        users = Users.query.all()
         err = 0
         for user in users:
             if (username == user.username):
@@ -110,7 +111,7 @@ def login():
     if request.method == 'POST':
         username = str(request.form['username'])
         passw = str(request.form['passw'])    
-        users = User.query.all()
+        users = Users.query.all()
         for user in users:
             if username == user.username:
                 if sha256_crypt.verify(passw, user.passw):
@@ -127,7 +128,15 @@ def login():
 def Home():
     if not session.get('logged_in'):
         return logout()
-    return render_template('home.html')    
+    else:
+        posts = db.engine.execute("SELECT * FROM posts")
+        for post in posts:
+            username = db.engine.execute("SELECT username FROM users WHERE id_acc = :val", {'val' : post.id_acc})
+
+        
+            
+
+    return render_template('home.html', post = post, username = username)    
 
 
 

@@ -36,13 +36,14 @@
           aria-expanded="true" aria-controls="collapseOne">
           {{ post.title }}
         </button>
+        <p style="float: right;">{{ username }}</p>
       </h2>
 
       <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
         data-bs-parent="#accordionExample">
         <div class="accordion-body">
           <form action="{{ post.id }}/delete" method="post">
-            {{ post.info }}
+            {{ post.description }}
             <p></p>
             <p style="align-content: flex-end;">{{ post.today }}  <button type="submit" class="btn btn-danger btn-sm" style="float: right;">Delete</button>
             </p>
