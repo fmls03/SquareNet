@@ -1,6 +1,5 @@
-from crypt import methods
 import os 
-from flask import Flask, render_template, redirect, request, session, flash, url_for
+from flask import Flask, render_template, redirect, request, session    
 from passlib.hash import sha256_crypt
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -36,13 +35,16 @@ class Posts(db.Model):
     description = db.Column(db.String(255))
     insertTime = db.Column(db.DateTime)
     likes = db.Column(db.Integer)
+    hashtag = db.Column(db.String(255))
     publisher = db.Column(db.String(255))
 
-    def __init__(self, title, description, insertTime, likes, publisher):
+
+    def __init__(self, title, description, insertTime, likes, hashtag, publisher ):
         self.title = title
         self.description = description
         self.insertTime = insertTime
         self.likes = likes
+        self.hashtag = hashtag
         self.publisher = publisher
 
 
@@ -123,36 +125,39 @@ def login():
     return render_template("login.html", alert=alert, session=session)
 
 
-@app.route('/Home')
+@app.route('/Home', methods=['GET', 'POST'])
 def Home():
     if not session.get('logged_in'):
         return logout()
     else:
-        i = 2
-        #posts = db.engine.execute("SELECT * FROM posts")
-        #for post in posts:
-        #    username = db.engine.execute("SELECT username FROM users WHERE id_acc = :val", {'val' : post.id_acc})
+        posts = Posts.query.all()
 
-    return render_template('home.html', username=username)#, post = post)    
-
-
-@app.route('/createPost', methods=['GET', 'POST'])
-def createPost():
-    if not session.get('logged_in'):
-        return logout()
-    else:
         if request.method == 'POST':
             title = request.form['title']
             description = request.form['description']
-            now = datetime.now()
-            likes = 0
-            publisher = username
-            newPost = Posts(title, description, now,likes, publisher)
-            db.session.add(newPost)
-            db.session.commit()
-            return redirect('/Home')
-    return render_template('createPost.html')
+            hashtag = request.form['hashtag']
+            if hashtag[0] == '#': 
+                now = datetime.now()
+                likes = 0
+                publisher = username
+                newPost = Posts(title, description, now,likes, hashtag, publisher)
+                db.session.add(newPost)
+                db.session.commit()
+            else:
+                hashtag = '#' + hashtag
+                now = datetime.now()
+                likes = 0
+                publisher = username
+                newPost = Posts(title, description, now,likes, hashtag, publisher)
+                db.session.add(newPost)
+                db.session.commit()
+            return redirecting()
+
+    return render_template('home.html', username=username, posts = posts)    
+
 
 if __name__ == "__main__":
     app.run("localhost", 5000, debug=True)
     logout()
+
+
