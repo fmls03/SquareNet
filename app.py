@@ -4,6 +4,8 @@ from passlib.hash import sha256_crypt
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
+from getmac import get_mac_address
+import urllib.request
 
 key = os.urandom(32)
 key = str(key)
@@ -21,12 +23,14 @@ class Users(db.Model):
     email = db.Column(db.String(255), unique = True)
     username = db.Column(db.String(255), unique = True)
     passw = db.Column(db.String(255))
-    id_acc = db.Column(db.Integer, primary_key = True, autoincrement = True) 
+    id_acc = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    mac = db.Column(db.String(255)) 
 
-    def __init__(self, email, username, passw):
+    def __init__(self, email, username, passw, mac):
         self.email = email
         self.username = username
         self.passw = passw
+        self.mac = mac
 
 
 class Posts(db.Model):
@@ -52,12 +56,31 @@ class Posts(db.Model):
 username = ""
 
 
+def getClientMac():
+    client_ip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
+    client_mac = get_mac_address(client_ip)
+    print(client_ip, client_mac)
+    return client_mac
+
+
 @app.route('/')
 def logout():
     session['logged_in'] = False  
     session.clear()
+    autoLoginUsingMac()
     return redirecting()
 
+def autoLoginUsingMac():
+    global username
+    getClientMac()
+    users = Users.query.all()
+    for user in users:
+        if getClientMac() == user.mac:
+            session['logged_in'] = True
+            username = user.username
+            
+            return redirecting(), session
+        
 
 @app.route('/redirecting')
 def redirecting():
@@ -118,8 +141,9 @@ def login():
         for user in users:
             if username == user.username:
                 if sha256_crypt.verify(passw, user.passw):
-                    session['logged_in'] = True   
-                    return redirecting()           
+                    session['logged_in'] = True  
+                    return redirecting()   
+
             else:
                 alert = "* WRONG CREDENTIALS *" 
     return render_template("login.html", alert=alert, session=session)
