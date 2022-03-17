@@ -3,7 +3,8 @@ from sqlalchemy import *
 from passlib.hash import sha256_crypt
 
 
-from app import app, db, Users
+from app import app, db
+from db_classes import Users
 from logout import logout
 from redirecting import redirecting
 

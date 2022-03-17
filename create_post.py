@@ -2,7 +2,8 @@ from flask import request, session, render_template
 import datetime
 
 
-from app import app, db, Posts
+from app import app, db
+from db_classes import Posts
 from logout import logout
 from redirecting import redirecting
 from login import login
