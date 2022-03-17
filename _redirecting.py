@@ -1,7 +1,7 @@
 from flask import session, redirect
 
 
-from app import app
+from _app import app
 
 
 @app.route('/redirecting')

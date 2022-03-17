@@ -3,14 +3,14 @@ from passlib.hash import sha256_crypt
 from flask import session, request, render_template
 
 
-from app import app
-from db_classes import Users
-from logout import logout
-from redirecting import redirecting
+from _app import bp
+from _db_classes import Users
+from _logout import logout
+from _redirecting import redirecting
 
 
 
-@app.route('/login', methods=["GET", "POST"])
+@bp.route('/login', methods=["GET", "POST"])
 def login():
     logout()
     if request.method == 'POST':
@@ -21,7 +21,10 @@ def login():
             if username == user.username:
                 if sha256_crypt.verify(passw, user.passw):
                     session['logged_in'] = True
+                    session['user_id'] = user.id_acc
+                    session['user_username'] = user.username
                     return redirecting()
                     
             else:
                 alert = "* WRONG CREDENTIALS *"
+    return render_template('auth/login.html', alert=alert)

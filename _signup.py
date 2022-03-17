@@ -3,10 +3,10 @@ from sqlalchemy import *
 from passlib.hash import sha256_crypt
 
 
-from app import app, db
-from db_classes import Users
-from logout import logout
-from redirecting import redirecting
+from _app import app, db
+from _db_classes import Users
+from _logout import logout
+from _redirecting import redirecting
 
 
 @app.route('/signup', methods=["GET", "POST"])

@@ -1,8 +1,8 @@
 from flask import session, render_template
 
 
-from app import app, db
-from logout import logout
+from _app import app, db
+from _logout import logout
 
 
 @app.route('/Home')

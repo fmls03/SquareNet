@@ -1,4 +1,4 @@
-from app import db
+from _app import db
 
 class Users(db.Model):
     email = db.Column(db.String(255), unique = True)
