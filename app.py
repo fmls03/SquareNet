@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from logout import logout
 
 
-key = os.urandom(32)
+key = os.urandom(256)
 key = str(key)
 
 app = Flask(__name__) # Modulo flask
