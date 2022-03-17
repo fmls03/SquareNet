@@ -1,10 +1,6 @@
-from crypt import methods
 import os 
-from flask import Flask, render_template, redirect, request, session, flash, url_for
-from passlib.hash import sha256_crypt
-from datetime import datetime
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import *
 
 
 from logout import logout
