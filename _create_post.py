@@ -1,15 +1,11 @@
-from flask import request, session, render_template
+from flask import request, session, render_template, Blueprint
 import datetime
 
-
-from _app import app, db
-from _db_classes import Posts
-from _logout import logout
-from _redirecting import redirecting
-from _login import login
+createPost_bp = Blueprint('createPost', __name__)
 
 
-@app.route('/createPost', methods=['GET', 'POST'])
+
+@createPost_bp.route('/createPost', methods=['GET', 'POST'])
 def createPost():
     if not session.get('logged_in'):
         return logout()

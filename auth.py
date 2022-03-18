@@ -1,19 +1,10 @@
-from flask import request, session, render_template, Blueprint
+from flask import Blueprint, redirect, session, render_template, request
+from sqlalchemy import *
+from passlib.hash import sha256_crypt
 
+auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 
-from _db_classes import Users
-from _logout import logout
-from _redirecting import redirecting
-
-
-auth_bp = Blueprint('auth', __name__, url_prefix="/auth")
-
-
-@auth_bp.route('/signup', methods=["GET", "POST"])
-def bu():
-    return "signin"
-
-
+@auth_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
     logout()
     alert = ""
@@ -45,11 +36,11 @@ def signup():
             db.session.add(u)
             db.session.commit()
                 
-            return redirecting()
+            return redirect("/")
                 
                 
-    return render_template("auth/signup.html", alert=alert, session=session)
-
+    return render_template("signup.html", alert=alert, session=session)
+    
 
 @auth_bp.route('/login', methods=["GET", "POST"])
 def login():
@@ -64,8 +55,15 @@ def login():
                     session['logged_in'] = True
                     session['user_id'] = user.id_acc
                     session['user_username'] = user.username
-                    return redirecting()
+                    return redirect("/")
                     
             else:
                 alert = "* WRONG CREDENTIALS *"
     return render_template('auth/login.html', alert=alert)
+
+
+@auth_bp.route('/logout')
+def logout():
+    session['logged_in'] = False  
+    session.clear()
+    return redirect("/")
