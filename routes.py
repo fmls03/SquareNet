@@ -1,17 +1,16 @@
-from flask import request, session, render_template
+from flask import Blueprint, session, render_template, request
 from sqlalchemy import *
 from passlib.hash import sha256_crypt
 
-
-from _app import app, db
-from _db_classes import Users
-from _logout import logout
-from _redirecting import redirecting
+from _app import db
+from _app import Users
 
 
-@app.route('/signup', methods=["GET", "POST"])
+auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
+
+@auth_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
-    logout()
+    session.clear()
     alert = ""
     if request.method == 'POST':
         email = str(request.form['email'])
@@ -41,7 +40,8 @@ def signup():
             db.session.add(u)
             db.session.commit()
                 
-            return redirecting()
+            return "redirecting"
                 
                 
-    return render_template("signup.html", alert=alert, session=session)
+    return render_template("auth/signup.html", alert=alert, session=session)
+    

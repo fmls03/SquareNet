@@ -1,9 +1,9 @@
 import os 
-from flask import Flask, Blueprint, g, redirect, session
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-
-import _routes
+import _db_classes
+import routes
 
 key = os.urandom(256)
 key = str(key)
@@ -13,10 +13,13 @@ app.config['SECRET_KEY'] = key
 app.config ['SQLALCHEMY_DATABASE_URI'] = 'mysql://fmlspi:Schipilliti03!@192.168.1.57/SquareNet'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+app.register_blueprint(auth_bp)
+
 db = SQLAlchemy(app)
 
-bp = Blueprint('auth', __name__, url_prefix='/auth', template_folder='templates')
-
+@app.route('/')
+def func():
+    return "hey"
 
 
 if __name__ == "__main__":
