@@ -2,7 +2,7 @@ from flask import Blueprint, redirect, session, render_template, request
 from sqlalchemy import *
 from passlib.hash import sha256_crypt
 
-auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
+auth_bp = Blueprint('auth_bp', __name__)
 
 @auth_bp.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -44,6 +44,7 @@ def signup():
 
 @auth_bp.route('/login', methods=["GET", "POST"])
 def login():
+    alert = ""
     logout()
     if request.method == 'POST':
         username = str(request.form['username'])
@@ -59,7 +60,7 @@ def login():
                     
             else:
                 alert = "* WRONG CREDENTIALS *"
-    return render_template('auth/login.html', alert=alert)
+    return render_template('login.html', alert=alert)
 
 
 @auth_bp.route('/logout')

@@ -1,8 +1,8 @@
-from flask import session, render_template
+from flask import session, render_template,Blueprint
 
+home_bp = Blueprint('home_bp', __name__)
 
-
-@app.route('/Home')
+@home_bp.route('/Home')
 def Home():
     if not session.get('logged_in'):
         return logout()

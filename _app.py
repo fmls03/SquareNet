@@ -2,9 +2,10 @@ import os
 from flask import Flask, session, redirect
 from flask_sqlalchemy import SQLAlchemy
 
-from auth import *
+from _auth import *
 from _create_post import *
 from _home import *
+from _redirecting import *
 
 
 key = os.urandom(256)
@@ -17,18 +18,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(createPost_bp)
+app.register_blueprint(redirecting_bp)
+app.register_blueprint(home_bp)
 
 db = SQLAlchemy(app)
-
-
-
-@app.route('/')
-def redirecting():
-    if not session.get('logged_in'):
-        return redirect('/auth/signup')
-    else:
-        return redirect('/Home')
-
 
 if __name__ == "__main__":
     app.run("localhost", 5000, debug=True)
